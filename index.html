@@ -139,53 +139,6 @@
   .modal-card ul{margin:0 0 16px;padding-left:20px;font-size:13.5px;line-height:1.7;color:#c9d8dd}
   .modal-card .close-modal{margin-top:6px;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:10px 16px;cursor:pointer}
 
-  /* ---------- финал: ссылки и действия ---------- */
-  .links{display:grid;gap:8px;margin:0 0 20px}
-  .links:empty{display:none;margin:0}
-  .links a{
-    display:block;text-decoration:none;color:#e8dfc9;font-size:13.5px;line-height:1.45;
-    background:rgba(224,185,106,.08);border:1px solid rgba(224,185,106,.28);
-    border-radius:10px;padding:11px 13px;transition:.2s
-  }
-  .links a:hover{background:rgba(224,185,106,.18);border-color:rgba(224,185,106,.6)}
-  .links a small{display:block;color:#93a8b0;font-size:11.5px;margin-top:3px}
-  .final-actions{display:none;gap:10px;margin-top:18px}
-  .final-actions.show{display:grid}
-  .ghost.wide{
-    width:100%;padding:12px 16px;border-radius:12px;font-size:14px;
-    background:rgba(255,255,255,.05);border:1px solid var(--line);cursor:pointer
-  }
-  .ghost.wide:hover{border-color:var(--accent);color:var(--accent)}
-
-  /* ---------- викторина ---------- */
-  .quiz-card{max-width:600px}
-  .quiz-top{display:flex;justify-content:space-between;align-items:center;gap:12px;
-    font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
-  .quiz-track{height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin:12px 0 18px;overflow:hidden}
-  .quiz-track i{display:block;height:100%;width:0;background:linear-gradient(90deg,#c9974a,#efd39b);transition:width .3s}
-  .quiz-q{font:600 20px/1.35 Georgia,"Times New Roman",serif;margin:0 0 16px}
-  .quiz-opts{display:grid;gap:9px}
-  .quiz-opts button{
-    text-align:left;padding:13px 15px;border-radius:11px;cursor:pointer;font-size:14px;line-height:1.4;
-    background:rgba(255,255,255,.045);border:1px solid var(--line);color:#dbe6ea;transition:.18s
-  }
-  .quiz-opts button:hover:not([disabled]){border-color:rgba(224,185,106,.6);background:rgba(224,185,106,.1)}
-  .quiz-opts button[disabled]{cursor:default;opacity:.92}
-  .quiz-opts button.right{border-color:#5fbf8a;background:rgba(95,191,138,.16);color:#eafff3}
-  .quiz-opts button.wrong{border-color:#d97a6c;background:rgba(217,122,108,.15);color:#ffece8}
-  .quiz-fb{margin:14px 0 0;font-size:13.5px;line-height:1.55;color:#c9d8dd;min-height:20px}
-  .quiz-next{margin-top:16px;width:100%;padding:12px 16px;border-radius:11px;border:0;cursor:pointer;
-    background:linear-gradient(135deg,#e8c98f,#c9974a);color:#241a0c;font-weight:650;font-size:14px;display:none}
-  .quiz-next.on{display:block}
-  .quiz-score{font:600 42px/1 Georgia,serif;color:var(--accent);margin:8px 0 10px}
-  .quiz-res-actions{display:grid;gap:9px;margin-top:18px}
-  .toast{
-    position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);z-index:40;
-    background:#12262e;border:1px solid var(--line);border-radius:999px;
-    padding:11px 20px;font-size:13.5px;opacity:0;pointer-events:none;transition:.3s
-  }
-  .toast.on{opacity:1;transform:translate(-50%,0)}
-
   /* ---------- мобильная версия ---------- */
   @media (max-width:760px){
     header{padding:12px 14px 8px}
@@ -212,7 +165,7 @@
   <div class="brand">
     <div class="mark">БАМ</div>
     <div>
-      <h1>Виртуальная экскурсия по Северобайкальскому району</h1>
+      <h1>Виртуальная экскурсия «Северобайкальск: ворота северного Байкала»</h1>
       <p class="sub" id="subline">6 остановок · северный Байкал</p>
     </div>
   </div>
@@ -248,13 +201,8 @@
     <h3 id="pTitle"></h3>
     <p class="body" id="pText"></p>
     <ul class="facts" id="pFacts"></ul>
-    <div class="links" id="pLinks"></div>
     <p class="credit" id="pCredit"></p>
     <button class="advance" id="pNext">Следующая остановка <span>›</span></button>
-    <div class="final-actions" id="pFinal">
-      <button class="advance" id="pQuiz">Пройти викторину <span>10</span></button>
-      <button class="ghost wide" id="pShare">Поделиться впечатлениями</button>
-    </div>
   </aside>
 </main>
 
@@ -263,130 +211,107 @@
 <div class="modal" id="modal">
   <div class="modal-card">
     <h2>О виртуальной экскурсии</h2>
-    <p>Шесть остановок по Северобайкальскому району Республики Бурятия — город, Байкал, термальные источники, Северомуйский тоннель, таёжные озёра и музей БАМа — и финальная панорама города с высоты.</p>
-    <ul>
-      <li>Потяните фотографию мышью или пальцем, чтобы осмотреться.</li>
-      <li>Колесо мыши или двойной щелчок — приблизить и отдалить.</li>
-      <li>Стрелки ← и → переключают остановки, Esc закрывает описание.</li>
-      <li>Нажмите на название остановки внизу, чтобы перейти к ней.</li>
-      <li>После финальной панорамы можно пройти викторину из 10 вопросов.</li>
-    </ul>
-    <p><b>Фотографии.</b> Иллюстрации взяты из Wikimedia Commons по свободным лицензиям (CC BY, CC BY-SA). Полный список авторов и ссылок — в файле <code>credits.json</code> и в подписи каждой остановки. Их можно заменить на собственные снимки, сохранив имена файлов в папке <code>images</code>.</p>
-    <p><b>Проект.</b> Учебная работа: виртуальная экскурсия как формат знакомства с труднодоступной территорией. Тур работает без интернета — это обычная HTML-страница.</p>
+    <p><b>Название:</b> «Северобайкальск: там, где начинается БАМ»</p>
+    <p><b>Тип:</b> Смешанная виртуальная экскурсия (историко-краеведческая с элементами природоведения)</p>
+    <p><b>Продолжительность:</b> 30–40 минут виртуального времени</p>
+    <p><b>Целевая аудитория:</b> школьники, студенты, потенциальные туристы, люди с ОВЗ, краеведы</p>
+    
+    <h3 style="margin-top:20px;margin-bottom:10px">Маршрут экскурсии (6 остановок)</h3>
+    <ol style="font-size:13.5px;line-height:1.7;color:#c9d8dd;padding-left:20px">
+      <li>«Точка отсчёта» — железнодорожный вокзал Северобайкальска</li>
+      <li>«Город у великого озера» — набережная и мыс Кадильный</li>
+      <li>«Виртуальный музей БАМа»</li>
+      <li>«Тайга и источники» — Гоуджекит и Дзелинда</li>
+      <li>«Подземный гигант» — Северомуйский тоннель</li>
+      <li>«Финал» — виртуальная смотровая площадка</li>
+    </ol>
+    
+    <p style="margin-top:16px"><b>Техническая реализация:</b> Marzipano (основной тур) + ThingLink (интерактивные точки) + Artsteps (виртуальный музей)</p>
+    
     <button class="close-modal" id="closeModal">Понятно</button>
   </div>
 </div>
-
-<div class="modal" id="quiz">
-  <div class="modal-card quiz-card">
-    <div class="quiz-top">
-      <span id="quizCounter">Вопрос 1 из 10</span>
-      <span id="quizScoreTop">Правильно: 0</span>
-    </div>
-    <div class="quiz-track"><i id="quizBar"></i></div>
-    <h2 class="quiz-q" id="quizQuestion"></h2>
-    <div class="quiz-opts" id="quizOptions"></div>
-    <p class="quiz-fb" id="quizFeedback"></p>
-    <button class="quiz-next" id="quizNext">Следующий вопрос →</button>
-    <div id="quizResult" style="display:none">
-      <div class="quiz-score" id="quizScore">0 / 10</div>
-      <p id="quizVerdict"></p>
-      <div class="quiz-res-actions">
-        <button class="close-modal" id="quizRestart">Пройти ещё раз</button>
-        <button class="close-modal" id="quizClose">Закрыть</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
 
 <script>
 /* ================= данные экскурсии ================= */
 const STOPS = [
   {
     id:"station",
-    title:"Железнодорожный вокзал",
-    subtitle:"«Точка отсчёта»: город родился вместе с БАМом",
+    title:"«Точка отсчёта» — Железнодорожный вокзал Северобайкальска",
+    subtitle:"360°-панорама привокзальной площади",
     img:"images/stop1.jpg",
-    text:"«Добро пожаловать в Северобайкальск! До 1974 года здесь была глухая тайга. Город родился вместе с БАМом, и вокзал стал его сердцем. Именно сюда прибывали первые строительные отряды. Сегодня это «ворота» северного Байкала. Оглянитесь: горы окружают город со всех сторон».",
+    text:"«Добро пожаловать в Северобайкальск! До 1974 года здесь была глухая тайга. Город родился вместе с БАМом, и вокзал стал его сердцем. Именно сюда прибывали первые строительные отряды. Сегодня это \"ворота\" северного Байкала. Оглянитесь: горы окружают город со всех сторон».",
     facts:[
-      "23 июля 1974 — прибытие первых строителей БАМа",
-      "29 сентября 1975 — посёлок стал рабочим",
-      "5 ноября 1980 — Северобайкальск получил статус города"
+      "1974 год — дата основания города Северобайкальска",
+      "1977 год — посёлок получил статус города",
+      "1989 год — официально образован Северобайкальский район"
     ],
-    credit:"Фото: Raki_Man, CC BY 3.0, Wikimedia Commons"
+    credit:"Интерактивные элементы: фото 1974 года, аудио гудка поезда, «БАМ в цифрах»"
   },
   {
     id:"baikal",
-    title:"Набережная Байкала",
-    subtitle:"«Город у великого озера» · северная оконечность",
+    title:"«Город у великого озера» — Набережная и мыс Кадильный",
+    subtitle:"360°-панорама набережной с видом на Байкал",
     img:"images/stop2.jpg",
-    text:"«Перед нами — северная, самая глубокая часть Байкала. Глубина здесь достигает 1642 метров, а вода настолько прозрачна, что весной видно дно на глубине 40 метров. Мыс Кадильный вдали — любимое место туристов. Летом здесь золотистый песок, зимой — знаменитый прозрачный лёд. Промышленная деятельность здесь запрещена, поэтому северный Байкал сохранил первозданность».",
+    text:"«Перед нами — северная, самая глубокая часть Байкала. Глубина здесь достигает 1637 метров, а вода настолько прозрачна, что весной видно дно на глубине 40 метров. Мыс Кадильный вдали — любимое место туристов. Летом здесь золотистый песок, зимой — знаменитый прозрачный лёд. Промышленная деятельность здесь запрещена, поэтому северный Байкал сохранил первозданность».",
     facts:[
-      "1 642 м — максимальная глубина Байкала",
-      "Вода прозрачна: дно видно на глубине до 40 м",
-      "Байкал — объект Всемирного наследия ЮНЕСКО"
+      "Байкал — самое глубокое озеро мира: 1637 м",
+      "В нём около 20 % мировых запасов пресной воды",
+      "Объект Всемирного наследия ЮНЕСКО"
     ],
-    credit:"Фото: Яковлев Роман Олегович, CC BY-SA 4.0, Wikimedia Commons"
+    credit:"Интерактивные элементы: 3D-модель омуля, видео ледостава, информация о ЮНЕСКО"
   },
   {
     id:"museum",
-    title:"Виртуальный музей БАМа",
-    subtitle:"Экспозиция в 3D · платформа Artsteps",
+    title:"«Виртуальный музей БАМа»",
+    subtitle:"3D-выставочное пространство с экспонатами",
     img:"images/stop3.jpg",
-    text:"«Мы в виртуальном музее БАМа. БАМ — не просто железная дорога, а «становой хребет» экономики района. Без него не было бы ни города, ни района. Пройдитесь по залам: фотографии первых строителей, макет Северомуйского тоннеля, предметы быта бамовцев — гитары, палатки, дневники».",
+    text:"«Мы в виртуальном музее БАМа. БАМ — не просто железная дорога, а \"становой хребет\" экономики района. Без него не было бы ни города, ни района. Пройдитесь по залам: фотографии первых строителей, макет Северомуйского тоннеля, предметы быта бамовцев — гитары, палатки, дневники».",
     facts:[
-      "Фотографии первых строителей магистрали",
+      "Фотографии первых строителей БАМа",
       "Макет Северомуйского тоннеля",
-      "Гитары, палатки и дневники бамовцев"
+      "Предметы быта бамовцев 1970–1980-х годов"
     ],
-    credit:"Фото: Liendain, CC BY 2.0, Wikimedia Commons"
+    credit:"Платформа: Artsteps · Интерактивные элементы: кликабельные экспонаты, аудиогид, викторина"
   },
   {
     id:"springs",
-    title:"Гоуджекит и Дзелинда",
-    subtitle:"«Тайга и источники» · термальные воды",
+    title:"«Тайга и источники» — Гоуджекит и Дзелинда",
+    subtitle:"360°-панорама природных источников",
     img:"images/stop4.jpg",
-    text:"«Мы на горячих источниках Гоуджекит. Температура воды здесь +50 °C даже зимой, когда на улице −40 °C. Туристы приезжают сюда круглый год. Вокруг — темнохвойная тайга: кедр, пихта, ель. Здесь обитают медведь, лось, кабарга, соболь, а выше в горах — северный олень. Это настоящий заповедник дикой природы».",
+    text:"«Мы на горячих источниках Гоуджекит. Температура воды здесь +50°C даже зимой, когда на улице -40°C. Туристы приезжают сюда круглый год. Вокруг — темнохвойная тайга: кедр, пихта, ель. Здесь обитают медведь, лось, кабарга, соболь, а выше в горах — северный олень. Это настоящий заповедник дикой природы».",
     facts:[
-      "+50 °C — температура воды круглый год",
-      "Темнохвойная тайга: кедр, пихта, ель",
-      "Медведь, лось, кабарга, соболь, северный олень"
+      "Температура воды: +50°C круглый год",
+      "Флора: кедр, пихта, ель",
+      "Фауна: медведь, лось, кабарга, соболь, северный олень"
     ],
-    credit:"Фото: Svetlana Ivanova, CC BY 3.0, Wikimedia Commons"
+    credit:"Интерактивные элементы: «Флора и фауна района», звуки тайги, мини-игра"
   },
   {
     id:"tunnel",
-    title:"Северомуйский тоннель",
-    subtitle:"«Подземный гигант» · 15 343 м",
+    title:"«Подземный гигант» — Северомуйский тоннель",
+    subtitle:"360°-панорама портала тоннеля",
     img:"images/stop5.jpg",
     text:"«Перед нами — Северомуйский тоннель, самый длинный железнодорожный тоннель в России: 15 343 метра. Строительство шло с 1977 по 2003 год — более четверти века! Строители проходили через разломы, подземные воды и вечную мерзлоту. Сегодня это объект индустриального туризма, а для экологов — пример бережного отношения к Байкалу».",
     facts:[
-      "15 343 м — самый длинный ж/д тоннель России",
-      "Строительство: 1977–2003 годы",
-      "Разломы, подземные воды и вечная мерзлота"
+      "15 343 м — длина тоннеля",
+      "Строительство: 1977–2003 годы (26 лет)",
+      "Самый длинный железнодорожный тоннель в России"
     ],
-    credit:"Фото: MOROVICTOR, CC BY-SA 3.0, Wikimedia Commons"
+    credit:"Интерактивные элементы: схема тоннеля, видео проезда, «Инженерные вызовы»"
   },
   {
-    id:"final",
-    final:true,
-    title:"Финал: смотровая площадка",
-    subtitle:"Северобайкальск с высоты птичьего полёта",
+    id:"finale",
+    title:"«Финал» — Виртуальная смотровая площадка",
+    subtitle:"Панорама с высоты птичьего полёта",
     img:"images/stop6.jpg",
-    text:"«Посмотрите на Северобайкальск с высоты: небольшой город между горами и великим озером. Он был построен за считанные годы благодаря энтузиазму тысяч людей. Сегодня это центр притяжения туристов. Виртуальная экскурсия позволила «пройти» этот маршрут, не выходя из дома. Но увидев эту красоту на экране, вы захотите увидеть её вживую. Северобайкальск ждёт вас!»",
+    text:"«Посмотрите на Северобайкальск с высоты: небольшой город между горами и великим озером. Он был построен за считанные годы благодаря энтузиазму тысяч людей. Сегодня это центр притяжения туристов. Виртуальная экскурсия позволила \"пройти\" этот маршрут, не выходя из дома. Но увидев эту красоту на экране, вы захотите увидеть её вживую. Северобайкальск ждёт вас!».",
     facts:[
-      "Город вырос на месте палаточного лагеря строителей БАМа",
-      "Он стоит между Байкальским хребтом и северной оконечностью Байкала",
-      "Финал: викторина из 10 вопросов и ссылки для реальной поездки"
+      "Кнопка «Поделиться впечатлениями»",
+      "Ссылки на туристические ресурсы района",
+      "Финальная викторина: 10 вопросов"
     ],
-    links:[
-      { name:"Туристский портал Республики Бурятия", url:"https://www.visitburyatia.ru" },
-      { name:"Официальный сайт города Северобайкальска", url:"https://severobaikalsk.ru" },
-      { name:"Официальный портал Республики Бурятия", url:"https://egov-buryatia.ru" }
-    ],
-    credit:"Фото: Yuri Samoilov, CC BY-SA 3.0, Wikimedia Commons"
+    credit:"Заключение: Виртуальная экскурсия — эффективный инструмент продвижения туризма в труднодоступном регионе"
   }
 ];
 
@@ -404,8 +329,6 @@ const modal   = document.getElementById("modal");
 
 let current = 0;
 let base = 1, z = 1, tx = 0, ty = 0;
-
-const TOTAL = STOPS.length;
 
 /* ================= масштаб и перетаскивание ================= */
 function layout(){
@@ -455,22 +378,19 @@ function show(i){
     photo.classList.add("ready");
   }
 
-  const isFinal = !!s.final;
-
-  numEl.textContent = pad(current + 1) + " / " + pad(TOTAL);
+  numEl.textContent = pad(current + 1) + " / " + pad(STOPS.length);
   titleEl.textContent = s.title;
   subEl.textContent = s.subtitle;
   bar.style.width = ((current + 1) / STOPS.length * 100) + "%";
 
-  document.getElementById("pEyebrow").textContent =
-    "Остановка " + (current + 1) + (isFinal ? " · финал" : "");
+  document.getElementById("pEyebrow").textContent = "Остановка " + (current + 1);
   document.getElementById("pTitle").textContent = s.title;
   document.getElementById("pText").textContent = s.text;
   document.getElementById("pCredit").textContent = s.credit;
 
   const list = document.getElementById("pFacts");
   list.innerHTML = "";
-  (s.facts || []).forEach((f, k) => {
+  s.facts.forEach((f, k) => {
     const li = document.createElement("li");
     const b = document.createElement("span");
     b.textContent = pad(k + 1);
@@ -479,25 +399,8 @@ function show(i){
     list.appendChild(li);
   });
 
-  const links = document.getElementById("pLinks");
-  links.innerHTML = "";
-  (s.links || []).forEach(l => {
-    const a = document.createElement("a");
-    a.href = l.url;
-    a.target = "_blank";
-    a.rel = "noopener";
-    a.textContent = l.name;
-    const sm = document.createElement("small");
-    sm.textContent = l.url.replace(/^https?:\/\//, "");
-    a.appendChild(sm);
-    links.appendChild(a);
-  });
-
-  document.getElementById("pNext").style.display = isFinal ? "none" : "";
-  document.getElementById("pFinal").classList.toggle("show", isFinal);
-
   document.getElementById("subline").textContent =
-    "остановка " + (current + 1) + " из " + TOTAL + " · " + s.title;
+    "остановка " + (current + 1) + " из " + STOPS.length + " · " + s.title;
 
   [...route.children].forEach((b, k) => b.classList.toggle("active", k === current));
 }
@@ -525,10 +428,6 @@ document.querySelector(".caption").addEventListener("click", () => panel.classLi
 
 /* ================= клавиатура ================= */
 document.addEventListener("keydown", e => {
-  if (quizModal.classList.contains("open")) {
-    if (e.key === "Escape") quizModal.classList.remove("open");
-    return;
-  }
   if (e.key === "ArrowRight") { show(current + 1); panel.classList.remove("open"); }
   if (e.key === "ArrowLeft")  { show(current - 1); panel.classList.remove("open"); }
   if (e.key === "Escape")     { panel.classList.remove("open"); modal.classList.remove("open"); }
@@ -589,177 +488,6 @@ window.addEventListener("resize", () => {
     render();
   }, 120);
 });
-
-/* ================= викторина ================= */
-const QUIZ = [
-  {
-    q:"В каком году Северобайкальск получил статус города?",
-    a:["1974","1980","1989"], c:1,
-    why:"Городом он стал 5 ноября 1980 года, а рабочим посёлком — 29 сентября 1975 года."
-  },
-  {
-    q:"Сколько метров в длину Северомуйский тоннель?",
-    a:["5 343 м","10 343 м","15 343 м"], c:2,
-    why:"15 343 метра — это самый длинный железнодорожный тоннель в России."
-  },
-  {
-    q:"Какова максимальная глубина Байкала?",
-    a:["1 642 м","1 200 м","2 100 м"], c:0,
-    why:"1 642 метра — Байкал самое глубокое озеро мира."
-  },
-  {
-    q:"Когда в Северобайкальск прибыли первые строители БАМа?",
-    a:["23 июля 1974 года","1 сентября 1975 года","5 ноября 1980 года"], c:0,
-    why:"23 июля 1974 года первые комсомольцы разбили на этом месте палаточный лагерь."
-  },
-  {
-    q:"На какой реке выходят горячие источники?",
-    a:["Тыя","Гоуджекит","Кичера"], c:1,
-    why:"Термальные воды выходят в долине реки Гоуджекит."
-  },
-  {
-    q:"Какой объект называют «воротами» Северобайкальска?",
-    a:["Морской порт","Железнодорожный вокзал","Музей БАМа"], c:1,
-    why:"Станция открылась вместе с западным участком БАМа и стала «воротами» города."
-  },
-  {
-    q:"Какая доля мировых запасов пресной воды сосредоточена в Байкале?",
-    a:["около 5 %","около 20 %","около 50 %"], c:1,
-    why:"В Байкале около 20 % мировых запасов пресной воды."
-  },
-  {
-    q:"Сколько лет строился Северомуйский тоннель?",
-    a:["5 лет","12 лет","26 лет"], c:2,
-    why:"Строительство шло с 1977 по 2003 год — 26 лет."
-  },
-  {
-    q:"Что представлено в музее БАМа?",
-    a:["Документы, фотографии и вещи строителей","Образцы минералов","Современная техника"], c:0,
-    why:"Экспозиция рассказывает о строительстве магистрали и о людях, которые её прокладывали."
-  },
-  {
-    q:"К какой категории отнесён Северобайкальский район по климату?",
-    a:["Районы Крайнего Севера","Средняя полоса","Субтропики"], c:0,
-    why:"Район приравнен к районам Крайнего Севера, поэтому зима здесь суровая и долгая."
-  }
-];
-
-const quizModal    = document.getElementById("quiz");
-const quizQuestion = document.getElementById("quizQuestion");
-const quizOptions  = document.getElementById("quizOptions");
-const quizFeedback = document.getElementById("quizFeedback");
-const quizNext     = document.getElementById("quizNext");
-const quizResult   = document.getElementById("quizResult");
-const quizBar      = document.getElementById("quizBar");
-const LETTERS = ["А", "Б", "В"];
-
-let qi = 0, qScore = 0, qLocked = false;
-
-function renderQuestion(){
-  qLocked = false;
-  const item = QUIZ[qi];
-  document.getElementById("quizCounter").textContent = "Вопрос " + (qi + 1) + " из " + QUIZ.length;
-  document.getElementById("quizScoreTop").textContent = "Правильно: " + qScore;
-  quizBar.style.width = (qi / QUIZ.length * 100) + "%";
-  quizQuestion.textContent = item.q;
-  quizFeedback.textContent = "";
-  quizNext.classList.remove("on");
-  quizOptions.innerHTML = "";
-  item.a.forEach((text, k) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = LETTERS[k] + ". " + text;
-    btn.addEventListener("click", () => answerQuiz(k));
-    quizOptions.appendChild(btn);
-  });
-}
-
-function answerQuiz(k){
-  if (qLocked) return;
-  qLocked = true;
-  const item = QUIZ[qi];
-  [...quizOptions.children].forEach((b, n) => {
-    b.disabled = true;
-    if (n === item.c) b.classList.add("right");
-    else if (n === k) b.classList.add("wrong");
-  });
-  const ok = k === item.c;
-  if (ok) qScore++;
-  quizFeedback.textContent = (ok ? "Верно. " : "Не совсем. ") + item.why;
-  document.getElementById("quizScoreTop").textContent = "Правильно: " + qScore;
-  quizNext.textContent = qi === QUIZ.length - 1 ? "Показать результат →" : "Следующий вопрос →";
-  quizNext.classList.add("on");
-}
-
-function nextQuestion(){
-  if (qi < QUIZ.length - 1) {
-    qi++;
-    renderQuestion();
-  } else {
-    showResult();
-  }
-}
-
-function showResult(){
-  quizBar.style.width = "100%";
-  quizQuestion.style.display = "none";
-  quizOptions.style.display = "none";
-  quizFeedback.style.display = "none";
-  quizNext.classList.remove("on");
-  quizResult.style.display = "block";
-  document.getElementById("quizScore").textContent = qScore + " / " + QUIZ.length;
-  document.getElementById("quizVerdict").textContent =
-    qScore >= 9 ? "Отличный результат — вы внимательно прошли весь маршрут." :
-    qScore >= 7 ? "Хороший результат: основные факты о районе вы запомнили." :
-    qScore >= 4 ? "Неплохо, но стоит вернуться к паре остановок и перечитать описание." :
-    "Похоже, экскурсию стоит пройти заново — начните с вокзала и двигайтесь по маршруту.";
-}
-
-function startQuiz(){
-  qi = 0; qScore = 0;
-  quizResult.style.display = "none";
-  quizQuestion.style.display = "";
-  quizOptions.style.display = "";
-  quizFeedback.style.display = "";
-  renderQuestion();
-  quizModal.classList.add("open");
-}
-
-quizNext.addEventListener("click", nextQuestion);
-document.getElementById("quizRestart").addEventListener("click", startQuiz);
-document.getElementById("quizClose").addEventListener("click", () => quizModal.classList.remove("open"));
-quizModal.addEventListener("click", e => { if (e.target === quizModal) quizModal.classList.remove("open"); });
-
-/* ================= поделиться ================= */
-let toastTimer = null;
-function showToast(text){
-  const t = document.getElementById("toast");
-  t.textContent = text;
-  t.classList.add("on");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove("on"), 2800);
-}
-
-async function shareTour(){
-  const data = {
-    title: document.title,
-    text: "Виртуальная экскурсия по Северобайкальскому району",
-    url: location.href
-  };
-  if (navigator.share) {
-    try { await navigator.share(data); return; }
-    catch (e) { if (e && e.name === "AbortError") return; }
-  }
-  try {
-    await navigator.clipboard.writeText(location.href);
-    showToast("Ссылка скопирована");
-  } catch (e) {
-    showToast("Скопируйте адрес из строки браузера");
-  }
-}
-
-document.getElementById("pQuiz").addEventListener("click", startQuiz);
-document.getElementById("pShare").addEventListener("click", shareTour);
 
 /* ================= старт ================= */
 show(0);
