@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Виртуальная экскурсия · Северобайкальский район</title>
+<style>
+  :root{
+    --bg:#0a1317;
+    --ink:#f3f7f8;
+    --muted:#9db2ba;
+    --accent:#e0b96a;
+    --panel:rgba(8,17,21,.86);
+    --line:rgba(255,255,255,.12);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    display:grid;grid-template-rows:auto auto 1fr auto;overflow:hidden;
+  }
+  button{font:inherit;color:inherit}
+
+  /* ---------- верхняя панель ---------- */
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:16px;padding:14px 24px 10px;z-index:6;
+  }
+  .brand{display:flex;align-items:center;gap:13px;min-width:0}
+  .mark{
+    width:46px;height:46px;border-radius:13px;flex:0 0 auto;
+    background:linear-gradient(145deg,#efd39b,#c9974a);
+    color:#2a2114;font-weight:800;font-size:12px;letter-spacing:.6px;
+    display:grid;place-items:center;
+  }
+  h1{font:600 19px/1.2 Georgia,"Times New Roman",serif;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sub{margin:3px 0 0;color:var(--muted);font-size:12.5px}
+
+  .top-actions{display:flex;gap:10px;align-items:center}
+  .ghost{
+    background:transparent;border:1px solid var(--line);border-radius:999px;
+    padding:9px 16px;font-size:13.5px;cursor:pointer;transition:.2s;
+  }
+  .ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+  .progress{height:2px;background:rgba(255,255,255,.08);position:relative;z-index:6}
+  .progress i{position:absolute;inset:0 auto 0 0;width:16.6%;background:linear-gradient(90deg,#c9974a,#efd39b);transition:width .45s ease}
+
+  /* ---------- сцена ---------- */
+  .stage{position:relative;margin:16px 24px 0;border-radius:18px;overflow:hidden;background:#0d1a20;min-height:0}
+  .viewport{position:absolute;inset:0;overflow:hidden;cursor:grab;touch-action:none}
+  .viewport.dragging{cursor:grabbing}
+  .canvas{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
+  .canvas img{display:block;width:100%;height:100%;user-select:none;-webkit-user-drag:none;opacity:0;transition:opacity .45s ease}
+  .canvas img.ready{opacity:1}
+
+  .shade{position:absolute;inset:0;pointer-events:none;
+    background:
+      linear-gradient(to top,rgba(4,10,12,.92) 0%,rgba(4,10,12,.45) 22%,rgba(4,10,12,0) 46%),
+      linear-gradient(to bottom,rgba(4,10,12,.55) 0%,rgba(4,10,12,0) 22%);
+  }
+
+  .caption{position:absolute;left:28px;bottom:26px;max-width:62%;pointer-events:none;z-index:3}
+  .num{font:600 12px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.22em;color:var(--accent);text-transform:uppercase}
+  .caption h2{font:600 34px/1.12 Georgia,"Times New Roman",serif;margin:8px 0 0;text-shadow:0 3px 24px rgba(0,0,0,.65)}
+  .caption p{margin:8px 0 0;color:#d7e3e7;font-size:14px;text-shadow:0 2px 14px rgba(0,0,0,.7)}
+
+  .hint{
+    position:absolute;right:22px;bottom:22px;z-index:3;pointer-events:none;
+    font-size:12px;color:#cfe0e5;background:rgba(6,14,18,.55);
+    border:1px solid var(--line);border-radius:999px;padding:8px 14px;backdrop-filter:blur(6px)
+  }
+
+  .arrow{
+    position:absolute;top:50%;transform:translateY(-50%);z-index:4;
+    width:46px;height:46px;border-radius:50%;border:1px solid var(--line);
+    background:rgba(6,14,18,.5);backdrop-filter:blur(6px);
+    display:grid;place-items:center;cursor:pointer;transition:.2s;font-size:22px;line-height:1
+  }
+  .arrow:hover{background:rgba(224,185,106,.9);color:#1a1308;border-color:transparent}
+  .arrow.prev{left:18px}
+  .arrow.next{right:18px}
+
+  /* ---------- боковая панель ---------- */
+  .panel{
+    position:absolute;top:0;right:0;bottom:0;width:min(400px,100%);
+    background:var(--panel);backdrop-filter:blur(14px);
+    border-left:1px solid var(--line);
+    transform:translateX(102%);transition:transform .38s cubic-bezier(.4,0,.2,1);
+    overflow-y:auto;padding:26px 26px 30px;z-index:5;
+  }
+  .panel.open{transform:none}
+  .panel .close{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;
+    background:rgba(255,255,255,.06);border:1px solid var(--line);cursor:pointer;font-size:17px;line-height:1}
+  .panel .eyebrow{color:var(--accent);font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;font-weight:600}
+  .panel h3{font:600 25px/1.2 Georgia,"Times New Roman",serif;margin:10px 32px 14px 0}
+  .panel .body{font-size:14.5px;line-height:1.62;color:#dbe6ea;margin:0 0 20px}
+  .facts{list-style:none;margin:0 0 22px;padding:0;display:grid;gap:8px}
+  .facts li{
+    background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:10px;
+    padding:11px 13px;font-size:13.5px;line-height:1.45;display:flex;gap:10px
+  }
+  .facts li span{color:var(--accent);font-weight:700}
+  .credit{font-size:11.5px;line-height:1.5;color:#8fa4ac;border-top:1px solid var(--line);padding-top:14px;margin:0}
+  .advance{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+    margin-top:18px;padding:13px 16px;border-radius:12px;cursor:pointer;
+    background:linear-gradient(135deg,#e8c98f,#c9974a);color:#241a0c;border:0;font-weight:650;font-size:14px
+  }
+  .advance:hover{filter:brightness(1.06)}
+
+  /* ---------- маршрут ---------- */
+  nav.route{display:flex;gap:10px;padding:14px 24px 18px;overflow-x:auto;scrollbar-width:thin}
+  nav.route button{
+    flex:0 0 auto;display:flex;align-items:center;gap:10px;
+    background:rgba(255,255,255,.04);border:1px solid var(--line);
+    border-radius:12px;padding:9px 14px 9px 10px;cursor:pointer;transition:.2s;
+    color:#c6d5da;font-size:13px;max-width:240px
+  }
+  nav.route button b{
+    width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.07);
+    display:grid;place-items:center;font:600 11.5px/1 ui-monospace,Consolas,monospace;color:#a9bfc6;flex:0 0 auto
+  }
+  nav.route button:hover{border-color:rgba(224,185,106,.55);color:#fff}
+  nav.route button.active{border-color:var(--accent);background:rgba(224,185,106,.14);color:#fff}
+  nav.route button.active b{background:var(--accent);color:#241a0c}
+  nav.route button span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* ---------- модальное окно ---------- */
+  .modal{position:fixed;inset:0;z-index:20;display:none;place-items:center;background:rgba(3,8,10,.72);padding:24px}
+  .modal.open{display:grid}
+  .modal-card{
+    background:#0d1a20;border:1px solid var(--line);border-radius:18px;
+    max-width:560px;width:100%;max-height:86vh;overflow:auto;padding:28px
+  }
+  .modal-card h2{font:600 23px/1.2 Georgia,serif;margin:0 0 12px}
+  .modal-card p{font-size:14px;line-height:1.65;color:#d5e2e6;margin:0 0 12px}
+  .modal-card ul{margin:0 0 16px;padding-left:20px;font-size:13.5px;line-height:1.7;color:#c9d8dd}
+  .modal-card .close-modal{margin-top:6px;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:10px 16px;cursor:pointer}
+
+  /* ---------- финал: ссылки и действия ---------- */
+  .links{display:grid;gap:8px;margin:0 0 20px}
+  .links:empty{display:none;margin:0}
+  .links a{
+    display:block;text-decoration:none;color:#e8dfc9;font-size:13.5px;line-height:1.45;
+    background:rgba(224,185,106,.08);border:1px solid rgba(224,185,106,.28);
+    border-radius:10px;padding:11px 13px;transition:.2s
+  }
+  .links a:hover{background:rgba(224,185,106,.18);border-color:rgba(224,185,106,.6)}
+  .links a small{display:block;color:#93a8b0;font-size:11.5px;margin-top:3px}
+  .final-actions{display:none;gap:10px;margin-top:18px}
+  .final-actions.show{display:grid}
+  .ghost.wide{
+    width:100%;padding:12px 16px;border-radius:12px;font-size:14px;
+    background:rgba(255,255,255,.05);border:1px solid var(--line);cursor:pointer
+  }
+  .ghost.wide:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* ---------- викторина ---------- */
+  .quiz-card{max-width:600px}
+  .quiz-top{display:flex;justify-content:space-between;align-items:center;gap:12px;
+    font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  .quiz-track{height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin:12px 0 18px;overflow:hidden}
+  .quiz-track i{display:block;height:100%;width:0;background:linear-gradient(90deg,#c9974a,#efd39b);transition:width .3s}
+  .quiz-q{font:600 20px/1.35 Georgia,"Times New Roman",serif;margin:0 0 16px}
+  .quiz-opts{display:grid;gap:9px}
+  .quiz-opts button{
+    text-align:left;padding:13px 15px;border-radius:11px;cursor:pointer;font-size:14px;line-height:1.4;
+    background:rgba(255,255,255,.045);border:1px solid var(--line);color:#dbe6ea;transition:.18s
+  }
+  .quiz-opts button:hover:not([disabled]){border-color:rgba(224,185,106,.6);background:rgba(224,185,106,.1)}
+  .quiz-opts button[disabled]{cursor:default;opacity:.92}
+  .quiz-opts button.right{border-color:#5fbf8a;background:rgba(95,191,138,.16);color:#eafff3}
+  .quiz-opts button.wrong{border-color:#d97a6c;background:rgba(217,122,108,.15);color:#ffece8}
+  .quiz-fb{margin:14px 0 0;font-size:13.5px;line-height:1.55;color:#c9d8dd;min-height:20px}
+  .quiz-next{margin-top:16px;width:100%;padding:12px 16px;border-radius:11px;border:0;cursor:pointer;
+    background:linear-gradient(135deg,#e8c98f,#c9974a);color:#241a0c;font-weight:650;font-size:14px;display:none}
+  .quiz-next.on{display:block}
+  .quiz-score{font:600 42px/1 Georgia,serif;color:var(--accent);margin:8px 0 10px}
+  .quiz-res-actions{display:grid;gap:9px;margin-top:18px}
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);z-index:40;
+    background:#12262e;border:1px solid var(--line);border-radius:999px;
+    padding:11px 20px;font-size:13.5px;opacity:0;pointer-events:none;transition:.3s
+  }
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+
+  /* ---------- мобильная версия ---------- */
+  @media (max-width:760px){
+    header{padding:12px 14px 8px}
+    .mark{width:40px;height:40px;border-radius:11px;font-size:11px}
+    h1{font-size:16px}
+    .sub{font-size:11.5px}
+    .ghost{padding:8px 13px;font-size:12.5px}
+    .stage{margin:12px 10px 0;border-radius:14px}
+    .caption{left:16px;bottom:18px;max-width:78%}
+    .caption h2{font-size:23px}
+    .hint{display:none}
+    .arrow{width:40px;height:40px;font-size:19px}
+    .arrow.prev{left:8px}.arrow.next{right:8px}
+    nav.route{padding:12px 10px 14px;gap:8px}
+    nav.route button{padding:8px 10px 8px 8px;font-size:12px;max-width:200px}
+    .panel{width:100%;border-left:0;border-top:1px solid var(--line);top:auto;height:78%;border-radius:16px 16px 0 0;padding:22px 18px 26px}
+    .panel.open{transform:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="mark">БАМ</div>
+    <div>
+      <h1>Виртуальная экскурсия по Северобайкальскому району</h1>
+      <p class="sub" id="subline">6 остановок · северный Байкал</p>
+    </div>
+  </div>
+  <div class="top-actions">
+    <button class="ghost" id="btnAbout">О туре</button>
+  </div>
+</header>
+<div class="progress"><i id="bar"></i></div>
+
+<main class="stage" id="stage">
+  <div class="viewport" id="viewport">
+    <div class="canvas" id="canvas">
+      <img id="photo" alt="">
+    </div>
+  </div>
+
+  <div class="shade"></div>
+
+  <div class="caption">
+    <div class="num" id="num">01 / 06</div>
+    <h2 id="title">Загрузка…</h2>
+    <p id="subtitle"></p>
+  </div>
+
+  <button class="arrow prev" id="prev" aria-label="Предыдущая остановка">‹</button>
+  <button class="arrow next" id="next" aria-label="Следующая остановка">›</button>
+
+  <div class="hint">Потяните фото · колесо мыши — приблизить</div>
+
+  <aside class="panel" id="panel" aria-live="polite">
+    <button class="close" id="closePanel" aria-label="Закрыть описание">✕</button>
+    <div class="eyebrow" id="pEyebrow">Остановка 1</div>
+    <h3 id="pTitle"></h3>
+    <p class="body" id="pText"></p>
+    <ul class="facts" id="pFacts"></ul>
+    <div class="links" id="pLinks"></div>
+    <p class="credit" id="pCredit"></p>
+    <button class="advance" id="pNext">Следующая остановка <span>›</span></button>
+    <div class="final-actions" id="pFinal">
+      <button class="advance" id="pQuiz">Пройти викторину <span>10</span></button>
+      <button class="ghost wide" id="pShare">Поделиться впечатлениями</button>
+    </div>
+  </aside>
+</main>
+
+<nav class="route" id="route" aria-label="Маршрут экскурсии"></nav>
+
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <h2>О виртуальной экскурсии</h2>
+    <p>Шесть остановок по Северобайкальскому району Республики Бурятия — город, Байкал, термальные источники, Северомуйский тоннель, таёжные озёра и музей БАМа — и финальная панорама города с высоты.</p>
+    <ul>
+      <li>Потяните фотографию мышью или пальцем, чтобы осмотреться.</li>
+      <li>Колесо мыши или двойной щелчок — приблизить и отдалить.</li>
+      <li>Стрелки ← и → переключают остановки, Esc закрывает описание.</li>
+      <li>Нажмите на название остановки внизу, чтобы перейти к ней.</li>
+      <li>После финальной панорамы можно пройти викторину из 10 вопросов.</li>
+    </ul>
+    <p><b>Фотографии.</b> Иллюстрации взяты из Wikimedia Commons по свободным лицензиям (CC BY, CC BY-SA). Полный список авторов и ссылок — в файле <code>credits.json</code> и в подписи каждой остановки. Их можно заменить на собственные снимки, сохранив имена файлов в папке <code>images</code>.</p>
+    <p><b>Проект.</b> Учебная работа: виртуальная экскурсия как формат знакомства с труднодоступной территорией. Тур работает без интернета — это обычная HTML-страница.</p>
+    <button class="close-modal" id="closeModal">Понятно</button>
+  </div>
+</div>
+
+<div class="modal" id="quiz">
+  <div class="modal-card quiz-card">
+    <div class="quiz-top">
+      <span id="quizCounter">Вопрос 1 из 10</span>
+      <span id="quizScoreTop">Правильно: 0</span>
+    </div>
+    <div class="quiz-track"><i id="quizBar"></i></div>
+    <h2 class="quiz-q" id="quizQuestion"></h2>
+    <div class="quiz-opts" id="quizOptions"></div>
+    <p class="quiz-fb" id="quizFeedback"></p>
+    <button class="quiz-next" id="quizNext">Следующий вопрос →</button>
+    <div id="quizResult" style="display:none">
+      <div class="quiz-score" id="quizScore">0 / 10</div>
+      <p id="quizVerdict"></p>
+      <div class="quiz-res-actions">
+        <button class="close-modal" id="quizRestart">Пройти ещё раз</button>
+        <button class="close-modal" id="quizClose">Закрыть</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= данные экскурсии ================= */
+const STOPS = [
+  {
+    id:"station",
+    title:"Железнодорожный вокзал",
+    subtitle:"«Точка отсчёта»: город родился вместе с БАМом",
+    img:"images/stop1.jpg",
+    text:"«Добро пожаловать в Северобайкальск! До 1974 года здесь была глухая тайга. Город родился вместе с БАМом, и вокзал стал его сердцем. Именно сюда прибывали первые строительные отряды. Сегодня это «ворота» северного Байкала. Оглянитесь: горы окружают город со всех сторон».",
+    facts:[
+      "23 июля 1974 — прибытие первых строителей БАМа",
+      "29 сентября 1975 — посёлок стал рабочим",
+      "5 ноября 1980 — Северобайкальск получил статус города"
+    ],
+    credit:"Фото: Raki_Man, CC BY 3.0, Wikimedia Commons"
+  },
+  {
+    id:"baikal",
+    title:"Набережная Байкала",
+    subtitle:"«Город у великого озера» · северная оконечность",
+    img:"images/stop2.jpg",
+    text:"«Перед нами — северная, самая глубокая часть Байкала. Глубина здесь достигает 1642 метров, а вода настолько прозрачна, что весной видно дно на глубине 40 метров. Мыс Кадильный вдали — любимое место туристов. Летом здесь золотистый песок, зимой — знаменитый прозрачный лёд. Промышленная деятельность здесь запрещена, поэтому северный Байкал сохранил первозданность».",
+    facts:[
+      "1 642 м — максимальная глубина Байкала",
+      "Вода прозрачна: дно видно на глубине до 40 м",
+      "Байкал — объект Всемирного наследия ЮНЕСКО"
+    ],
+    credit:"Фото: Яковлев Роман Олегович, CC BY-SA 4.0, Wikimedia Commons"
+  },
+  {
+    id:"museum",
+    title:"Виртуальный музей БАМа",
+    subtitle:"Экспозиция в 3D · платформа Artsteps",
+    img:"images/stop3.jpg",
+    text:"«Мы в виртуальном музее БАМа. БАМ — не просто железная дорога, а «становой хребет» экономики района. Без него не было бы ни города, ни района. Пройдитесь по залам: фотографии первых строителей, макет Северомуйского тоннеля, предметы быта бамовцев — гитары, палатки, дневники».",
+    facts:[
+      "Фотографии первых строителей магистрали",
+      "Макет Северомуйского тоннеля",
+      "Гитары, палатки и дневники бамовцев"
+    ],
+    credit:"Фото: Liendain, CC BY 2.0, Wikimedia Commons"
+  },
+  {
+    id:"springs",
+    title:"Гоуджекит и Дзелинда",
+    subtitle:"«Тайга и источники» · термальные воды",
+    img:"images/stop4.jpg",
+    text:"«Мы на горячих источниках Гоуджекит. Температура воды здесь +50 °C даже зимой, когда на улице −40 °C. Туристы приезжают сюда круглый год. Вокруг — темнохвойная тайга: кедр, пихта, ель. Здесь обитают медведь, лось, кабарга, соболь, а выше в горах — северный олень. Это настоящий заповедник дикой природы».",
+    facts:[
+      "+50 °C — температура воды круглый год",
+      "Темнохвойная тайга: кедр, пихта, ель",
+      "Медведь, лось, кабарга, соболь, северный олень"
+    ],
+    credit:"Фото: Svetlana Ivanova, CC BY 3.0, Wikimedia Commons"
+  },
+  {
+    id:"tunnel",
+    title:"Северомуйский тоннель",
+    subtitle:"«Подземный гигант» · 15 343 м",
+    img:"images/stop5.jpg",
+    text:"«Перед нами — Северомуйский тоннель, самый длинный железнодорожный тоннель в России: 15 343 метра. Строительство шло с 1977 по 2003 год — более четверти века! Строители проходили через разломы, подземные воды и вечную мерзлоту. Сегодня это объект индустриального туризма, а для экологов — пример бережного отношения к Байкалу».",
+    facts:[
+      "15 343 м — самый длинный ж/д тоннель России",
+      "Строительство: 1977–2003 годы",
+      "Разломы, подземные воды и вечная мерзлота"
+    ],
+    credit:"Фото: MOROVICTOR, CC BY-SA 3.0, Wikimedia Commons"
+  },
+  {
+    id:"final",
+    final:true,
+    title:"Финал: смотровая площадка",
+    subtitle:"Северобайкальск с высоты птичьего полёта",
+    img:"images/stop6.jpg",
+    text:"«Посмотрите на Северобайкальск с высоты: небольшой город между горами и великим озером. Он был построен за считанные годы благодаря энтузиазму тысяч людей. Сегодня это центр притяжения туристов. Виртуальная экскурсия позволила «пройти» этот маршрут, не выходя из дома. Но увидев эту красоту на экране, вы захотите увидеть её вживую. Северобайкальск ждёт вас!»",
+    facts:[
+      "Город вырос на месте палаточного лагеря строителей БАМа",
+      "Он стоит между Байкальским хребтом и северной оконечностью Байкала",
+      "Финал: викторина из 10 вопросов и ссылки для реальной поездки"
+    ],
+    links:[
+      { name:"Туристский портал Республики Бурятия", url:"https://www.visitburyatia.ru" },
+      { name:"Официальный сайт города Северобайкальска", url:"https://severobaikalsk.ru" },
+      { name:"Официальный портал Республики Бурятия", url:"https://egov-buryatia.ru" }
+    ],
+    credit:"Фото: Yuri Samoilov, CC BY-SA 3.0, Wikimedia Commons"
+  }
+];
+
+/* ================= элементы ================= */
+const vp      = document.getElementById("viewport");
+const canvas  = document.getElementById("canvas");
+const photo   = document.getElementById("photo");
+const bar     = document.getElementById("bar");
+const numEl   = document.getElementById("num");
+const titleEl = document.getElementById("title");
+const subEl   = document.getElementById("subtitle");
+const panel   = document.getElementById("panel");
+const route   = document.getElementById("route");
+const modal   = document.getElementById("modal");
+
+let current = 0;
+let base = 1, z = 1, tx = 0, ty = 0;
+
+const TOTAL = STOPS.length;
+
+/* ================= масштаб и перетаскивание ================= */
+function layout(){
+  const vw = vp.clientWidth, vh = vp.clientHeight;
+  const iw = photo.naturalWidth  || 1600;
+  const ih = photo.naturalHeight || 1000;
+  base = Math.max(vw / iw, vh / ih);
+  canvas.style.width  = (iw * base) + "px";
+  canvas.style.height = (ih * base) + "px";
+}
+
+function clampView(){
+  const W = canvas.offsetWidth * z, H = canvas.offsetHeight * z;
+  const vw = vp.clientWidth, vh = vp.clientHeight;
+  tx = (W <= vw) ? (vw - W) / 2 : Math.min(0, Math.max(vw - W, tx));
+  ty = (H <= vh) ? (vh - H) / 2 : Math.min(0, Math.max(vh - H, ty));
+}
+
+function render(){
+  canvas.style.transform = "translate3d(" + tx + "px," + ty + "px,0) scale(" + z + ")";
+}
+
+function resetView(){
+  z = 1;
+  layout();
+  tx = (vp.clientWidth  - canvas.offsetWidth)  / 2;
+  ty = (vp.clientHeight - canvas.offsetHeight) / 2;
+  clampView();
+  render();
+}
+
+const pad = n => String(n).padStart(2, "0");
+
+/* ================= переключение остановок ================= */
+function show(i){
+  current = (i + STOPS.length) % STOPS.length;
+  const s = STOPS[current];
+
+  photo.classList.remove("ready");
+  photo.onload = () => {
+    resetView();
+    photo.classList.add("ready");
+  };
+  photo.src = s.img;
+  if (photo.complete && photo.naturalWidth) {
+    resetView();
+    photo.classList.add("ready");
+  }
+
+  const isFinal = !!s.final;
+
+  numEl.textContent = pad(current + 1) + " / " + pad(TOTAL);
+  titleEl.textContent = s.title;
+  subEl.textContent = s.subtitle;
+  bar.style.width = ((current + 1) / STOPS.length * 100) + "%";
+
+  document.getElementById("pEyebrow").textContent =
+    "Остановка " + (current + 1) + (isFinal ? " · финал" : "");
+  document.getElementById("pTitle").textContent = s.title;
+  document.getElementById("pText").textContent = s.text;
+  document.getElementById("pCredit").textContent = s.credit;
+
+  const list = document.getElementById("pFacts");
+  list.innerHTML = "";
+  (s.facts || []).forEach((f, k) => {
+    const li = document.createElement("li");
+    const b = document.createElement("span");
+    b.textContent = pad(k + 1);
+    li.appendChild(b);
+    li.appendChild(document.createTextNode(f));
+    list.appendChild(li);
+  });
+
+  const links = document.getElementById("pLinks");
+  links.innerHTML = "";
+  (s.links || []).forEach(l => {
+    const a = document.createElement("a");
+    a.href = l.url;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.textContent = l.name;
+    const sm = document.createElement("small");
+    sm.textContent = l.url.replace(/^https?:\/\//, "");
+    a.appendChild(sm);
+    links.appendChild(a);
+  });
+
+  document.getElementById("pNext").style.display = isFinal ? "none" : "";
+  document.getElementById("pFinal").classList.toggle("show", isFinal);
+
+  document.getElementById("subline").textContent =
+    "остановка " + (current + 1) + " из " + TOTAL + " · " + s.title;
+
+  [...route.children].forEach((b, k) => b.classList.toggle("active", k === current));
+}
+
+/* ================= маршрут ================= */
+STOPS.forEach((s, i) => {
+  const b = document.createElement("button");
+  b.innerHTML = "<b>" + pad(i + 1) + "</b><span></span>";
+  b.querySelector("span").textContent = s.title;
+  b.addEventListener("click", () => { show(i); panel.classList.remove("open"); });
+  route.appendChild(b);
+});
+
+/* ================= кнопки ================= */
+document.getElementById("prev").addEventListener("click", () => show(current - 1));
+document.getElementById("next").addEventListener("click", () => show(current + 1));
+document.getElementById("pNext").addEventListener("click", () => show(current + 1));
+document.getElementById("closePanel").addEventListener("click", () => panel.classList.remove("open"));
+document.getElementById("btnAbout").addEventListener("click", () => modal.classList.add("open"));
+document.getElementById("closeModal").addEventListener("click", () => modal.classList.remove("open"));
+modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("open"); });
+
+/* открыть описание по клику на подпись */
+document.querySelector(".caption").addEventListener("click", () => panel.classList.add("open"));
+
+/* ================= клавиатура ================= */
+document.addEventListener("keydown", e => {
+  if (quizModal.classList.contains("open")) {
+    if (e.key === "Escape") quizModal.classList.remove("open");
+    return;
+  }
+  if (e.key === "ArrowRight") { show(current + 1); panel.classList.remove("open"); }
+  if (e.key === "ArrowLeft")  { show(current - 1); panel.classList.remove("open"); }
+  if (e.key === "Escape")     { panel.classList.remove("open"); modal.classList.remove("open"); }
+});
+
+/* ================= мышь и тач ================= */
+let drag = null;
+vp.addEventListener("pointerdown", e => {
+  drag = { x: e.clientX, y: e.clientY, tx, ty, id: e.pointerId };
+  vp.setPointerCapture(e.pointerId);
+  vp.classList.add("dragging");
+});
+vp.addEventListener("pointermove", e => {
+  if (!drag) return;
+  tx = drag.tx + (e.clientX - drag.x);
+  ty = drag.ty + (e.clientY - drag.y);
+  clampView();
+  render();
+});
+const endDrag = () => { drag = null; vp.classList.remove("dragging"); };
+vp.addEventListener("pointerup", endDrag);
+vp.addEventListener("pointercancel", endDrag);
+vp.addEventListener("pointerleave", endDrag);
+
+vp.addEventListener("wheel", e => {
+  e.preventDefault();
+  const r = vp.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const old = z;
+  z = Math.min(2.8, Math.max(1, z * (e.deltaY < 0 ? 1.12 : 1 / 1.12)));
+  const k = z / old;
+  tx = mx - k * (mx - tx);
+  ty = my - k * (my - ty);
+  clampView();
+  render();
+}, { passive: false });
+
+vp.addEventListener("dblclick", () => {
+  const old = z;
+  z = z > 1.05 ? 1 : 1.8;
+  const r = vp.getBoundingClientRect();
+  const mx = r.width / 2, my = r.height / 2, k = z / old;
+  tx = mx - k * (mx - tx);
+  ty = my - k * (my - ty);
+  clampView();
+  render();
+});
+
+/* ================= ресайз ================= */
+let resizeTimer = null;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const oldZ = z;
+    layout();
+    z = oldZ;
+    clampView();
+    render();
+  }, 120);
+});
+
+/* ================= викторина ================= */
+const QUIZ = [
+  {
+    q:"В каком году Северобайкальск получил статус города?",
+    a:["1974","1980","1989"], c:1,
+    why:"Городом он стал 5 ноября 1980 года, а рабочим посёлком — 29 сентября 1975 года."
+  },
+  {
+    q:"Сколько метров в длину Северомуйский тоннель?",
+    a:["5 343 м","10 343 м","15 343 м"], c:2,
+    why:"15 343 метра — это самый длинный железнодорожный тоннель в России."
+  },
+  {
+    q:"Какова максимальная глубина Байкала?",
+    a:["1 642 м","1 200 м","2 100 м"], c:0,
+    why:"1 642 метра — Байкал самое глубокое озеро мира."
+  },
+  {
+    q:"Когда в Северобайкальск прибыли первые строители БАМа?",
+    a:["23 июля 1974 года","1 сентября 1975 года","5 ноября 1980 года"], c:0,
+    why:"23 июля 1974 года первые комсомольцы разбили на этом месте палаточный лагерь."
+  },
+  {
+    q:"На какой реке выходят горячие источники?",
+    a:["Тыя","Гоуджекит","Кичера"], c:1,
+    why:"Термальные воды выходят в долине реки Гоуджекит."
+  },
+  {
+    q:"Какой объект называют «воротами» Северобайкальска?",
+    a:["Морской порт","Железнодорожный вокзал","Музей БАМа"], c:1,
+    why:"Станция открылась вместе с западным участком БАМа и стала «воротами» города."
+  },
+  {
+    q:"Какая доля мировых запасов пресной воды сосредоточена в Байкале?",
+    a:["около 5 %","около 20 %","около 50 %"], c:1,
+    why:"В Байкале около 20 % мировых запасов пресной воды."
+  },
+  {
+    q:"Сколько лет строился Северомуйский тоннель?",
+    a:["5 лет","12 лет","26 лет"], c:2,
+    why:"Строительство шло с 1977 по 2003 год — 26 лет."
+  },
+  {
+    q:"Что представлено в музее БАМа?",
+    a:["Документы, фотографии и вещи строителей","Образцы минералов","Современная техника"], c:0,
+    why:"Экспозиция рассказывает о строительстве магистрали и о людях, которые её прокладывали."
+  },
+  {
+    q:"К какой категории отнесён Северобайкальский район по климату?",
+    a:["Районы Крайнего Севера","Средняя полоса","Субтропики"], c:0,
+    why:"Район приравнен к районам Крайнего Севера, поэтому зима здесь суровая и долгая."
+  }
+];
+
+const quizModal    = document.getElementById("quiz");
+const quizQuestion = document.getElementById("quizQuestion");
+const quizOptions  = document.getElementById("quizOptions");
+const quizFeedback = document.getElementById("quizFeedback");
+const quizNext     = document.getElementById("quizNext");
+const quizResult   = document.getElementById("quizResult");
+const quizBar      = document.getElementById("quizBar");
+const LETTERS = ["А", "Б", "В"];
+
+let qi = 0, qScore = 0, qLocked = false;
+
+function renderQuestion(){
+  qLocked = false;
+  const item = QUIZ[qi];
+  document.getElementById("quizCounter").textContent = "Вопрос " + (qi + 1) + " из " + QUIZ.length;
+  document.getElementById("quizScoreTop").textContent = "Правильно: " + qScore;
+  quizBar.style.width = (qi / QUIZ.length * 100) + "%";
+  quizQuestion.textContent = item.q;
+  quizFeedback.textContent = "";
+  quizNext.classList.remove("on");
+  quizOptions.innerHTML = "";
+  item.a.forEach((text, k) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = LETTERS[k] + ". " + text;
+    btn.addEventListener("click", () => answerQuiz(k));
+    quizOptions.appendChild(btn);
+  });
+}
+
+function answerQuiz(k){
+  if (qLocked) return;
+  qLocked = true;
+  const item = QUIZ[qi];
+  [...quizOptions.children].forEach((b, n) => {
+    b.disabled = true;
+    if (n === item.c) b.classList.add("right");
+    else if (n === k) b.classList.add("wrong");
+  });
+  const ok = k === item.c;
+  if (ok) qScore++;
+  quizFeedback.textContent = (ok ? "Верно. " : "Не совсем. ") + item.why;
+  document.getElementById("quizScoreTop").textContent = "Правильно: " + qScore;
+  quizNext.textContent = qi === QUIZ.length - 1 ? "Показать результат →" : "Следующий вопрос →";
+  quizNext.classList.add("on");
+}
+
+function nextQuestion(){
+  if (qi < QUIZ.length - 1) {
+    qi++;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult(){
+  quizBar.style.width = "100%";
+  quizQuestion.style.display = "none";
+  quizOptions.style.display = "none";
+  quizFeedback.style.display = "none";
+  quizNext.classList.remove("on");
+  quizResult.style.display = "block";
+  document.getElementById("quizScore").textContent = qScore + " / " + QUIZ.length;
+  document.getElementById("quizVerdict").textContent =
+    qScore >= 9 ? "Отличный результат — вы внимательно прошли весь маршрут." :
+    qScore >= 7 ? "Хороший результат: основные факты о районе вы запомнили." :
+    qScore >= 4 ? "Неплохо, но стоит вернуться к паре остановок и перечитать описание." :
+    "Похоже, экскурсию стоит пройти заново — начните с вокзала и двигайтесь по маршруту.";
+}
+
+function startQuiz(){
+  qi = 0; qScore = 0;
+  quizResult.style.display = "none";
+  quizQuestion.style.display = "";
+  quizOptions.style.display = "";
+  quizFeedback.style.display = "";
+  renderQuestion();
+  quizModal.classList.add("open");
+}
+
+quizNext.addEventListener("click", nextQuestion);
+document.getElementById("quizRestart").addEventListener("click", startQuiz);
+document.getElementById("quizClose").addEventListener("click", () => quizModal.classList.remove("open"));
+quizModal.addEventListener("click", e => { if (e.target === quizModal) quizModal.classList.remove("open"); });
+
+/* ================= поделиться ================= */
+let toastTimer = null;
+function showToast(text){
+  const t = document.getElementById("toast");
+  t.textContent = text;
+  t.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("on"), 2800);
+}
+
+async function shareTour(){
+  const data = {
+    title: document.title,
+    text: "Виртуальная экскурсия по Северобайкальскому району",
+    url: location.href
+  };
+  if (navigator.share) {
+    try { await navigator.share(data); return; }
+    catch (e) { if (e && e.name === "AbortError") return; }
+  }
+  try {
+    await navigator.clipboard.writeText(location.href);
+    showToast("Ссылка скопирована");
+  } catch (e) {
+    showToast("Скопируйте адрес из строки браузера");
+  }
+}
+
+document.getElementById("pQuiz").addEventListener("click", startQuiz);
+document.getElementById("pShare").addEventListener("click", shareTour);
+
+/* ================= старт ================= */
+show(0);
+</script>
+</body>
+</html>
